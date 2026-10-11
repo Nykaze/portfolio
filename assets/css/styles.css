@@ -40,7 +40,7 @@
   --text-muted: #4c5855;
   --accent: #0a7a52;
   --accent-ink: #ffffff;
-  --accent-soft: rgba(10, 122, 82, 0.08);
+  --accent-soft: rgba(10, 122, 82, 0.12);
   --shadow: 0 1px 2px rgba(14, 18, 17, 0.08);
 
   --r: 6px;
@@ -143,19 +143,23 @@ a { color: inherit; text-decoration: none; }
   border-radius: 2px;
 }
 
+/* Fica fora da tela por transform, nunca por top: animar top
+   dispara layout a cada quadro. E fixed, e nao absolute, para o
+   link aparecer no topo da viewport mesmo com a pagina rolada. */
 .skip-link {
-  position: absolute;
+  position: fixed;
   left: 1rem;
-  top: -4rem;
+  top: 1rem;
   z-index: 100;
   padding: 0.6rem 1rem;
   background: var(--accent);
   color: var(--accent-ink);
   border-radius: var(--r);
   font-weight: 600;
-  transition: top 0.2s var(--ease);
+  transform: translateY(calc(-100% - 1rem));
+  transition: transform 0.2s var(--ease);
 }
-.skip-link:focus { top: 1rem; }
+.skip-link:focus { transform: none; }
 
 .shell {
   width: 100%;
@@ -169,6 +173,20 @@ a { color: inherit; text-decoration: none; }
   height: 1em;
   fill: currentColor;
   flex: none;
+}
+
+/* Texto so para leitor de tela. Usado nas listas de icones, onde o
+   nome da ferramenta mora no title e o SVG e aria-hidden. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
 /* ---------- 4. Nav ---------------------------------------- */
@@ -325,13 +343,14 @@ a { color: inherit; text-decoration: none; }
   align-items: start;
 }
 
-/* Trilho que une os nos. top = padding do fluxo + metade do no,
-   para a linha passar pelo centro das bolas. */
+/* Trilho que une os nos. left/right = 12,5%, ou seja, o centro da
+   primeira e da ultima coluna: a linha comeca no primeiro no e
+   termina no ultimo, sem sobra pendurada nas pontas. */
 .flow__rail {
   position: absolute;
   top: calc(1.5rem + 5px);
-  left: 6%;
-  right: 6%;
+  left: 12.5%;
+  right: 12.5%;
   height: 1px;
   background: var(--border-strong);
 }
@@ -488,17 +507,17 @@ a { color: inherit; text-decoration: none; }
 
 .link {
   display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
   align-self: flex-start;
   font-size: 0.9375rem;
   font-weight: 500;
   color: var(--accent);
   border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
   padding-bottom: 1px;
-  transition: border-color 0.2s var(--ease), gap 0.2s var(--ease);
+  /* O link tem um unico filho, entao gap nao fazia nada no hover.
+     O mesmo recuo do contact-row, por transform, sem reflow. */
+  transition: border-color 0.2s var(--ease), transform 0.25s var(--ease);
 }
-.link:hover { border-bottom-color: var(--accent); gap: 0.6rem; }
+.link:hover { border-bottom-color: var(--accent); transform: translateX(0.25rem); }
 
 /* ---------- 7. Secoes ------------------------------------- */
 .section {
@@ -566,6 +585,24 @@ a { color: inherit; text-decoration: none; }
 .project__text {
   color: var(--text-muted);
   max-width: 58ch;
+}
+
+/* Rotulo do tipo de trabalho e a nota de credito. Mono so aqui:
+   um e data, o outro e referencia. */
+.project__kind {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+}
+.project__note {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  max-width: 54ch;
+}
+.project__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
 }
 
 .project__tech {
