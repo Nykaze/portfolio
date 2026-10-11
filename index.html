@@ -23,6 +23,8 @@
 </head>
 <body>
 
+<div class="progress" aria-hidden="true"><div class="progress__bar" id="progress-bar"></div></div>
+
 <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
 <!-- ============ NAV ============ -->
@@ -67,7 +69,7 @@
       </h1>
 
       <p class="hero__sub">
-        Back end de sites, APIs e middleware. Node.js, Python, Java e Socket.IO.
+        Construo back end, APIs e middleware. Node.js, Python, Java e Socket.IO.
         Estudante de TADS na UniSalesiano Araçatuba, indo para cybersegurança.
       </p>
 
@@ -76,6 +78,18 @@
         <a class="btn btn--ghost" href="https://github.com/Nykaze" target="_blank" rel="noopener noreferrer">
           GitHub
         </a>
+      </div>
+
+      <!-- Diagrama do caminho que ele constroi: request entra, middleware
+           traduz, banco responde. Sem animacao ele continua legivel. -->
+      <div class="flow">
+        <span class="flow__rail" aria-hidden="true"></span>
+        <ol class="flow__track">
+          <li class="flow__step"><span class="flow__dot"></span><span class="flow__name">requisição</span></li>
+          <li class="flow__step"><span class="flow__dot"></span><span class="flow__name">middleware</span></li>
+          <li class="flow__step"><span class="flow__dot"></span><span class="flow__name">banco</span></li>
+          <li class="flow__step"><span class="flow__dot"></span><span class="flow__name">resposta</span></li>
+        </ol>
       </div>
     </div>
 
@@ -104,11 +118,11 @@
 <!-- ============ PROJETOS ============ -->
 <section class="section" id="projetos">
   <div class="shell">
-    <h2 class="section__title">Projetos</h2>
+    <h2 class="section__title" data-reveal><h2 class="section__title">Projetos</h2>
 
     <div class="projects">
 
-      <article class="project">
+      <article class="project" data-reveal">
         <a class="project__visual" href="https://github.com/Nykaze/Community-Agritech-Evo"
            target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
           <img src="assets/img/agritech-banner.jpg" width="1400" height="470"
@@ -129,7 +143,7 @@
         </div>
       </article>
 
-      <article class="project project--tinted">
+      <article class="project" data-reveal project--tinted">
         <div class="project__body">
           <h3 class="project__title">Estoque RPG</h3>
           <p class="project__text">
@@ -156,13 +170,13 @@
 <!-- ============ SOBRE ============ -->
 <section class="section" id="sobre">
   <div class="shell">
-    <h2 class="section__title">Sobre</h2>
+    <h2 class="section__title" data-reveal><h2 class="section__title">Sobre</h2>
 
-    <div class="manifesto">
+    <div class="manifesto" data-reveal>
       <p class="manifesto__lead">
-        Eu trabalho na parte que ninguém vê funcionando direito: a autenticação que não
-        deixa passar, a validação que não deixa dado sujo chegar no banco, a consulta que
-        não derruba o serviço.
+        Me interesso pela parte que ninguém vê funcionando direito: a autenticação que
+        não deixa passar, a validação que não deixa dado sujo chegar no banco, a consulta
+        que não derruba o serviço.
       </p>
       <p class="manifesto__body">
         É o meio de campo entre o front e o back. O front chama, o back responde, e tudo
@@ -173,15 +187,15 @@
     </div>
 
     <div class="pillars">
-      <div class="pillar">
+      <div class="pillar" data-reveal>
         <h3 class="pillar__title">Back end e APIs</h3>
         <p class="pillar__text">Node.js, Express e Python. Rotas, autenticação, validação e regras de negócio.</p>
       </div>
-      <div class="pillar">
+      <div class="pillar" data-reveal>
         <h3 class="pillar__title">Tempo real</h3>
         <p class="pillar__text">Socket.IO e WebSocket para estado sincronizado entre vários clientes.</p>
       </div>
-      <div class="pillar">
+      <div class="pillar" data-reveal>
         <h3 class="pillar__title">Banco de dados</h3>
         <p class="pillar__text">Modelagem, consultas e índices. Performance importa tanto quanto o código.</p>
       </div>
@@ -192,10 +206,10 @@
 <!-- ============ STACK ============ -->
 <section class="section" id="stack">
   <div class="shell">
-    <h2 class="section__title">Stack</h2>
+    <h2 class="section__title" data-reveal><h2 class="section__title">Stack</h2>
 
     <div class="stack-grid">
-      <div class="stack-group">
+      <div class="stack-group" data-reveal>
         <h3 class="stack-group__title">Back end e tempo real</h3>
         <ul class="stack-list">
           <li title="Node.js"><svg class="icon" aria-hidden="true"><use href="#i-nodedotjs"></use></svg></li>
@@ -206,7 +220,7 @@
         </ul>
       </div>
 
-      <div class="stack-group">
+      <div class="stack-group" data-reveal>
         <h3 class="stack-group__title">Front</h3>
         <ul class="stack-list">
           <li title="Svelte"><svg class="icon" aria-hidden="true"><use href="#i-svelte"></use></svg></li>
@@ -216,7 +230,7 @@
         </ul>
       </div>
 
-      <div class="stack-group">
+      <div class="stack-group" data-reveal>
         <h3 class="stack-group__title">Ferramentas</h3>
         <ul class="stack-list">
           <li title="Docker"><svg class="icon" aria-hidden="true"><use href="#i-docker"></use></svg></li>
@@ -232,35 +246,35 @@
 <!-- ============ TRAJETORIA ============ -->
 <section class="section" id="trajetoria">
   <div class="shell">
-    <h2 class="section__title">Trajetória</h2>
+    <h2 class="section__title" data-reveal><h2 class="section__title">Trajetória</h2>
 
     <ol class="timeline">
-      <li class="timeline__item">
+      <li class="timeline__item" data-reveal>
         <p class="timeline__when">Agora</p>
         <div>
           <h3 class="timeline__title">TADS na UniSalesiano Araçatuba</h3>
           <p class="timeline__text">Análise e Desenvolvimento de Sistemas. Banco de dados, redes e desenvolvimento web.</p>
         </div>
       </li>
-      <li class="timeline__item">
-        <p class="timeline__when">No trabalho</p>
-        <div>
-          <h3 class="timeline__title">Back end de sites e middleware</h3>
-          <p class="timeline__text">Sistemas web com Node.js e APIs, mantendo a camada que liga o front ao back.</p>
-        </div>
-      </li>
-      <li class="timeline__item">
+      <li class="timeline__item" data-reveal>
         <p class="timeline__when">2026</p>
         <div>
-          <h3 class="timeline__title">Primeiros projetos publicados</h3>
-          <p class="timeline__text">Estoque RPG e Community Agritech Evo, abertos no GitHub com README e licença.</p>
+          <h3 class="timeline__title">Estoque RPG</h3>
+          <p class="timeline__text">Primeiro projeto completo: back end em Node.js com Socket.IO e front em Svelte 5, publicados no GitHub.</p>
         </div>
       </li>
-      <li class="timeline__item">
+      <li class="timeline__item" data-reveal>
+        <p class="timeline__when">2026</p>
+        <div>
+          <h3 class="timeline__title">Community Agritech Evo</h3>
+          <p class="timeline__text">Mod completo em Java e Gradle, com energia RF, máquinas, módulos e datapacks. Traduzir um sistema inteiro para Java me ensinou mais do que qualquer exercício da faculdade.</p>
+        </div>
+      </li>
+      <li class="timeline__item" data-reveal>
         <p class="timeline__when">Próximo</p>
         <div>
           <h3 class="timeline__title">Cibersegurança</h3>
-          <p class="timeline__text">Redes, Linux e estudo de vulnerabilidades. É para onde a faculdade está me levando.</p>
+          <p class="timeline__text">Terminar o curso e migrar para a área: redes, Linux e estudo de vulnerabilidades.</p>
         </div>
       </li>
     </ol>
@@ -270,14 +284,14 @@
 <!-- ============ CONTATO ============ -->
 <section class="section section--contact" id="contato">
   <div class="shell">
-    <h2 class="section__title">Contato</h2>
+    <h2 class="section__title" data-reveal><h2 class="section__title">Contato</h2>
 
     <p class="contact__lead">
-      Se você tem um back end para construir, um middleware com problema ou quer falar
-      de segurança, meu e-mail está aberto.
-    </p>
+        Se você tem um back end para construir, um middleware com problema ou quer falar
+        de segurança, meu e-mail está aberto.
+      </p>
 
-    <ul class="contact-list">
+    <ul class="contact-list" data-reveal>
       <li>
         <a class="contact-row" href="mailto:Nykaze@outlook.com">
           <span class="contact-row__label">E-mail</span>

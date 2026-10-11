@@ -1,25 +1,83 @@
 /* =========================================================
    Gabriel Nykaze · portfolio
    Sem dependencias. Sem build.
-   - uma unica animacao autoral: a chegada do hero
+   - barra de progresso do scroll (transform puro)
+   - revelacao por secao ao entrar na tela
+   - animacao do diagrama request -> resposta (CSS)
+   - animacao de chegada do hero
    - menu do mobile
-   - marca a nav como colada quando o topo sai da tela
-   - alterna o tema e lembra da escolha
+   - nav colada e alternador de tema
    ========================================================= */
 (function () {
   "use strict";
 
   var root = document.documentElement;
-  var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---- 1. Um momento autoral no hero ---------------------- */
-  /* A classe so entra se o usuario nao pediu movimento reduzido,
-     entao o padrao do documento continua sendo visivel e estatico. */
-  if (!prefersReduced && !location.hash) {
+  /* ---- 1. Barra de progresso ------------------------------ */
+  /* Le a posicao uma vez por quadro e escreve so transform.
+     Nada de estado no React, nada de reflow em cascata. */
+  var bar = document.getElementById("progress-bar");
+  if (bar) {
+    var queued = false;
+
+    function paint() {
+      queued = false;
+      var doc = document.documentElement;
+      var max = doc.scrollHeight - doc.clientHeight;
+      var pct = max > 0 ? Math.min(doc.scrollTop / max, 1) : 0;
+      bar.style.transform = "scaleX(" + pct + ")";
+    }
+
+    function queue() {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(paint);
+    }
+
+    window.addEventListener("scroll", queue, { passive: true });
+    window.addEventListener("resize", queue);
+    paint();
+  }
+
+  /* ---- 2. Revelacao ao entrar na tela --------------------- */
+  /* A classe .js-reveal so entra quando o movimento e aceito.
+     Sem ela, [data-reveal] fica visivel e sem transicao. */
+  if (!reduced && "IntersectionObserver" in window) {
+    root.classList.add("js-reveal");
+
+    var targets = document.querySelectorAll("[data-reveal]");
+
+    // Escalona quem esta no mesmo bloco pai, para a entrada ler
+    // como sequencia e nao como oito coisas independentes.
+    var seen = new WeakMap();
+    targets.forEach(function (el) {
+      var group = el.parentElement;
+      var i = seen.get(group) || 0;
+      el.style.transitionDelay = Math.min(i, 3) * 80 + "ms";
+      seen.set(group, i + 1);
+    });
+
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-in");
+          io.unobserve(entry.target);
+        });
+      },
+      { rootMargin: "0px 0px -10% 0px", threshold: 0 }
+    );
+
+    targets.forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---- 3. Chegada do hero --------------------------------- */
+  if (!reduced && !location.hash) {
     root.classList.add("js-anim");
   }
 
-  /* ---- 2. Nav colada --------------------------------------- */
+  /* ---- 4. Nav colada -------------------------------------- */
   var nav = document.getElementById("nav");
   if (nav && "IntersectionObserver" in window) {
     var sentinel = document.createElement("div");
@@ -35,7 +93,7 @@
     ).observe(sentinel);
   }
 
-  /* ---- 3. Menu do mobile ----------------------------------- */
+  /* ---- 5. Menu do mobile ---------------------------------- */
   var burger = document.getElementById("nav-toggle");
   var links = document.getElementById("nav-links");
 
@@ -50,7 +108,6 @@
       setMenu(nav.dataset.menu !== "open");
     });
 
-    // Fecha ao escolher um destino.
     links.addEventListener("click", function (e) {
       if (e.target.closest("a")) setMenu(false);
     });
@@ -62,7 +119,6 @@
       }
     });
 
-    // Fecha se a tela crescer e voltar a caber a barra inteira.
     window.matchMedia("(min-width: 681px)").addEventListener("change", function (e) {
       if (e.matches) setMenu(false);
     });
@@ -70,7 +126,7 @@
     setMenu(false);
   }
 
-  /* ---- 4. Tema --------------------------------------------- */
+  /* ---- 6. Tema -------------------------------------------- */
   var toggle = document.getElementById("theme-toggle");
   var KEY = "nykaze-theme";
   var systemDark = window.matchMedia("(prefers-color-scheme: dark)");

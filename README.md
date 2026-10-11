@@ -69,19 +69,33 @@ node tools/contrast.mjs
 
 ## Movimento
 
-Um momento só: a chegada do hero, escalonada na ordem de leitura. A classe que
-dispara a animação é adicionada por JavaScript, então sem JS a página já nasce
-visível, e com `prefers-reduced-motion` nada se move.
+Quatro camadas, todas desligadas por `prefers-reduced-motion`:
+
+1. **Chegada do hero** no load, escalonada na ordem de leitura.
+2. **Diagrama request → middleware → banco → resposta** no hero. O trilho anima
+   `background-position` (paint puro, sem reflow) e cada nó acende quando o
+   varredor passa por ele.
+3. **Revelação por seção** ao entrar na tela, com escalonamento dentro de cada
+   grupo. A classe `.js-reveal` só entra quando o movimento é aceito, então sem
+   JS a página já nasce visível.
+4. **Barra de progresso** no topo, `scaleX` puro, alimentada por `requestAnimationFrame`.
 
 ## Conferir visualmente
 
 ```bash
-node tools/shots.mjs
+node tools/contrast.mjs            # contraste dos dois temas, precisa dar 0 falhas
+node tools/shots.mjs               # desktop e mobile, claro e escuro
+node tools/verify.mjs              # erros de JS e estado das animacoes
+node tools/verify.mjs --motion     # o mesmo forçando movimento ligado
 ```
 
-Gera desktop e mobile nos dois tema em
-`%TEMP%\opencode\shots`. O Chrome headless no Windows tem largura mínima de 500px,
-por isso o mobile sai de um iframe de 390px.
+As capturas vão para `%TEMP%\opencode\shots`. O Chrome headless no Windows tem
+largura mínima de 500px, por isso o mobile sai de um iframe de 390px. Ele também
+emula `prefers-reduced-motion: reduce`, por isso `verify.mjs` tem o flag
+`--motion` para testar o caminho animado de verdade.
+
+Abra as capturas e **olhe**. O `contrast.mjs` só checa texto sobre superfície: não
+vê alinhamento quebrado, imagem que não carregou, nem card com buraco.
 
 ## Deploy
 
