@@ -1,48 +1,30 @@
 /* =========================================================
    Gabriel Nykaze · portfolio
    Sem dependencias. Sem build.
-   - revela blocos no scroll (IntersectionObserver)
+   - uma unica animacao autoral: a chegada do hero
+   - menu do mobile
    - marca a nav como colada quando o topo sai da tela
    - alterna o tema e lembra da escolha
    ========================================================= */
 (function () {
   "use strict";
 
-  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var root = document.documentElement;
+  var prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* ---- 1. Revelar blocos ------------------------------------ */
-  var revealables = document.querySelectorAll(
-    ".section__title, .bento > *, .manifesto > *, .pillar, .stack-group, .timeline__item, .contact__links > *"
-  );
-
-  if (reduceMotion || !("IntersectionObserver" in window)) {
-    revealables.forEach(function (el) { el.classList.add("is-in"); });
-  } else {
-    revealables.forEach(function (el, i) {
-      el.setAttribute("data-reveal", "");
-      // Escalona dentro do mesmo bloco para a entrada ler como sequência.
-      el.style.transitionDelay = Math.min(i % 3, 2) * 70 + "ms";
-    });
-
-    var io = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-in");
-          io.unobserve(entry.target);
-        });
-      },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.12 }
-    );
-
-    revealables.forEach(function (el) { io.observe(el); });
+  /* ---- 1. Um momento autoral no hero ---------------------- */
+  /* A classe so entra se o usuario nao pediu movimento reduzido,
+     entao o padrao do documento continua sendo visivel e estatico. */
+  if (!prefersReduced && !location.hash) {
+    root.classList.add("js-anim");
   }
 
-  /* ---- 2. Nav colada ---------------------------------------- */
+  /* ---- 2. Nav colada --------------------------------------- */
   var nav = document.getElementById("nav");
   if (nav && "IntersectionObserver" in window) {
     var sentinel = document.createElement("div");
-    sentinel.style.cssText = "position:absolute;top:0;height:1px;width:1px;pointer-events:none;";
+    sentinel.style.cssText =
+      "position:absolute;top:0;height:1px;width:1px;pointer-events:none;";
     document.body.prepend(sentinel);
 
     new IntersectionObserver(
@@ -53,45 +35,79 @@
     ).observe(sentinel);
   }
 
-  /* ---- 3. Tema ---------------------------------------------- */
-  var toggle = document.getElementById("theme-toggle");
-  var root = document.documentElement;
-  var KEY = "nykaze-theme";
+  /* ---- 3. Menu do mobile ----------------------------------- */
+  var burger = document.getElementById("nav-toggle");
+  var links = document.getElementById("nav-links");
 
-  var prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
+  if (nav && burger && links) {
+    function setMenu(open) {
+      nav.dataset.menu = open ? "open" : "closed";
+      burger.setAttribute("aria-expanded", String(open));
+      burger.setAttribute("aria-label", open ? "Fechar menu" : "Abrir menu");
+    }
+
+    burger.addEventListener("click", function () {
+      setMenu(nav.dataset.menu !== "open");
+    });
+
+    // Fecha ao escolher um destino.
+    links.addEventListener("click", function (e) {
+      if (e.target.closest("a")) setMenu(false);
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && nav.dataset.menu === "open") {
+        setMenu(false);
+        burger.focus();
+      }
+    });
+
+    // Fecha se a tela crescer e voltar a caber a barra inteira.
+    window.matchMedia("(min-width: 681px)").addEventListener("change", function (e) {
+      if (e.matches) setMenu(false);
+    });
+
+    setMenu(false);
+  }
+
+  /* ---- 4. Tema --------------------------------------------- */
+  var toggle = document.getElementById("theme-toggle");
+  var KEY = "nykaze-theme";
+  var systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+
   var stored = null;
   try { stored = localStorage.getItem(KEY); } catch (e) { /* modo privado */ }
 
   function resolved() {
-    return stored || (prefersDark.matches ? "dark" : "light");
+    return stored || (systemDark.matches ? "dark" : "light");
   }
 
-  function apply() {
+  function applyTheme() {
     var theme = resolved();
     root.setAttribute("data-theme", theme);
     if (toggle) {
-      toggle.setAttribute("aria-pressed", String(theme === "dark"));
-      toggle.setAttribute("aria-label",
-        theme === "dark" ? "Ativar tema claro" : "Ativar tema escuro");
+      var dark = theme === "dark";
+      toggle.setAttribute("aria-pressed", String(dark));
+      toggle.setAttribute("aria-label", dark ? "Ativar tema claro" : "Ativar tema escuro");
     }
   }
 
-  apply();
+  applyTheme();
 
   if (toggle) {
     toggle.addEventListener("click", function () {
       stored = resolved() === "dark" ? "light" : "dark";
       try { localStorage.setItem(KEY, stored); } catch (e) { /* ignora */ }
-      apply();
+      applyTheme();
     });
   }
 
   // Segue o sistema enquanto o usuario nao escolher um tema.
-  if (prefersDark.addEventListener) {
-    prefersDark.addEventListener("change", function () {
+  if (systemDark.addEventListener) {
+    systemDark.addEventListener("change", function () {
       stored = null;
       try { localStorage.removeItem(KEY); } catch (e) { /* ignora */ }
-      apply();
+      applyTheme();
     });
   }
 })();

@@ -25,10 +25,12 @@ async function save(relPath, url, transform) {
   console.log(`write  ${relPath} (${(body.length / 1024).toFixed(1)} kB)`);
 }
 
-/* 1. Fontes self-hosted (variavel, subset latin) ---------------------------- */
+/* 1. Fontes self-hosted (subset latin) -------------------------------------- */
+/* Archivo para o texto, IBM Plex Mono para dado, data e codigo. */
 const FONTS = [
-  ["assets/fonts/geist-latin-wght-normal.woff2", "https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@latest/files/geist-latin-wght-normal.woff2"],
-  ["assets/fonts/geist-mono-latin-wght-normal.woff2", "https://cdn.jsdelivr.net/npm/@fontsource-variable/geist-mono@latest/files/geist-mono-latin-wght-normal.woff2"],
+  ["assets/fonts/archivo-latin-wght-normal.woff2", "https://cdn.jsdelivr.net/npm/@fontsource-variable/archivo@latest/files/archivo-latin-wght-normal.woff2"],
+  ["assets/fonts/ibm-plex-mono-latin-400-normal.woff2", "https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-mono@latest/files/ibm-plex-mono-latin-400-normal.woff2"],
+  ["assets/fonts/ibm-plex-mono-latin-500-normal.woff2", "https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-mono@latest/files/ibm-plex-mono-latin-500-normal.woff2"],
 ];
 
 /* 2. Sprite de icones (Simple Icons + Devicon) ------------------------------- */
@@ -66,6 +68,8 @@ async function buildSprite() {
   }
 
   // LinkedIn saiu do Simple Icons (pedido de marca). Vem do Devicon.
+  // Tira todo fill fixo: os paths passam a herdar currentColor e o fundo
+  // fica só com opacidade, senão o glifo some no tema claro.
   const li = await fetch(
     "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/linkedin/linkedin-original.svg"
   );
@@ -73,7 +77,10 @@ async function buildSprite() {
   const paths = [...liSvg.matchAll(/<path fill="[^"]*" d="([^"]+)"/g)].map((m) => m[1]);
   symbols.push(
     `<symbol id="i-linkedin" viewBox="0 0 128 128">${paths
-      .map((d, i) => `<path d="${d}"${i === 0 ? ' fill="currentColor" opacity=".25"' : ""}/>`)
+      .map(
+        (d, i) =>
+          `<path d="${d}"${i === 0 ? ' opacity=".18"' : ""}/>`
+      )
       .join("")}</symbol>`
   );
 
