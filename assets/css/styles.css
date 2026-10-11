@@ -1,0 +1,642 @@
+/* =========================================================
+   Gabriel Nykaze · portfolio
+   Tokens → base → layout → componentes → responsivo
+   ========================================================= */
+
+/* ---------- 1. Fontes self-hosted ------------------------- */
+@font-face {
+  font-family: "Geist";
+  src: url("../fonts/geist-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("../fonts/geist-mono-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+  font-style: normal;
+}
+
+/* ---------- 2. Tokens ------------------------------------ */
+/* Tema claro é o padrao do arquivo. O escuro entra pela
+   preferencia do sistema e pode ser forcado pelo botao. */
+:root {
+  --bg: #f7f8f8;
+  --surface: #ffffff;
+  --surface-2: #eef1f0;
+  --border: #dfe4e3;
+  --border-strong: #c4cdcb;
+  --text: #0e1211;
+  --text-muted: #4c5855;
+  --accent: #0a7a52;
+  --accent-ink: #ffffff;
+  --accent-soft: rgba(10, 122, 82, 0.09);
+  --shadow: 0 1px 2px rgba(14, 18, 17, 0.04), 0 8px 24px -12px rgba(14, 18, 17, 0.14);
+
+  --r: 6px;
+  --shell: 1180px;
+  --pad: clamp(1.25rem, 4vw, 2.5rem);
+
+  --sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "Cascadia Code", "SF Mono", monospace;
+
+  --ease: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0d0e;
+    --surface: #121617;
+    --surface-2: #171c1d;
+    --border: #232a2b;
+    --border-strong: #364041;
+    --text: #e6ecea;
+    --text-muted: #98a6a3;
+    --accent: #4ade80;
+    --accent-ink: #06251a;
+    --accent-soft: rgba(74, 222, 128, 0.1);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 28px -14px rgba(0, 0, 0, 0.7);
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0b0d0e;
+  --surface: #121617;
+  --surface-2: #171c1d;
+  --border: #232a2b;
+  --border-strong: #364041;
+  --text: #e6ecea;
+  --text-muted: #98a6a3;
+  --accent: #4ade80;
+  --accent-ink: #06251a;
+  --accent-soft: rgba(74, 222, 128, 0.1);
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 28px -14px rgba(0, 0, 0, 0.7);
+}
+
+/* ---------- 3. Base --------------------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+  scroll-padding-top: 5.5rem;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  font-weight: 600;
+  letter-spacing: -0.022em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+p { margin: 0; }
+ul, ol, dl, dd { margin: 0; padding: 0; }
+li { list-style: none; }
+
+img { display: block; max-width: 100%; height: auto; }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -4rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-radius: var(--r);
+  font-weight: 600;
+  transition: top 0.2s var(--ease);
+}
+.skip-link:focus { top: 1rem; }
+
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+
+.icon {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  flex: none;
+}
+
+/* ---------- 4. Nav ---------------------------------------- */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(12px) saturate(1.4);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.25s var(--ease), background 0.25s var(--ease);
+}
+.nav[data-stuck="true"] { border-bottom-color: var(--border); }
+
+.nav__inner {
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.nav__brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+.nav__handle {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: var(--text-muted);
+}
+
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: 1.75rem;
+  margin-left: auto;
+}
+.nav__links a {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  transition: color 0.2s var(--ease);
+}
+.nav__links a:hover { color: var(--text); }
+
+/* Botao de tema */
+.theme-toggle {
+  flex: none;
+  border: 1px solid var(--border);
+  background: transparent;
+  border-radius: 999px;
+  padding: 3px;
+  cursor: pointer;
+  line-height: 0;
+  transition: border-color 0.2s var(--ease);
+}
+.theme-toggle:hover { border-color: var(--border-strong); }
+.theme-toggle__track {
+  display: block;
+  width: 34px;
+  height: 18px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  position: relative;
+  transition: background 0.25s var(--ease);
+}
+.theme-toggle__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--accent);
+  transition: transform 0.28s var(--ease);
+}
+.theme-toggle[aria-pressed="true"] .theme-toggle__thumb { transform: translateX(16px); }
+
+/* ---------- 5. Hero --------------------------------------- */
+.hero {
+  padding-block: clamp(3rem, 7vw, 5.5rem) clamp(3.5rem, 8vw, 6.5rem);
+}
+.hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  align-items: start;
+}
+
+.hero__eyebrow {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 1.5rem;
+}
+
+.hero__title {
+  font-size: clamp(2.25rem, 5.4vw, 4rem);
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+}
+
+.hero__sub {
+  margin-top: 1.5rem;
+  max-width: 46ch;
+  font-size: clamp(1rem, 1.15vw, 1.125rem);
+  color: var(--text-muted);
+}
+
+.hero__actions {
+  margin-top: 2.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* Painel de linguagens */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+}
+.panel__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.panel__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+}
+.panel__ref {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.panel__ref:hover { color: var(--accent); }
+
+.langs { padding-block: 0.5rem; }
+.langs__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-block: 0.5rem;
+}
+.langs__row + .langs__row { border-top: 1px solid var(--border); }
+.langs dt { font-size: 0.9375rem; }
+.langs dd {
+  font-family: var(--mono);
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+.panel__note {
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+/* ---------- 6. Botoes e links ----------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.15rem;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.2s var(--ease), border-color 0.2s var(--ease),
+              transform 0.15s var(--ease), color 0.2s var(--ease);
+}
+.btn:active { transform: translateY(1px); }
+
+.btn--primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.btn--primary:hover { background: color-mix(in srgb, var(--accent) 88%, var(--text)); }
+
+.btn--ghost {
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+.btn--ghost:hover { border-color: var(--text); }
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--accent);
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+  padding-bottom: 1px;
+  transition: border-color 0.2s var(--ease), gap 0.2s var(--ease);
+}
+.link:hover {
+  border-bottom-color: var(--accent);
+  gap: 0.6rem;
+}
+
+/* ---------- 7. Secoes ------------------------------------- */
+.section {
+  padding-block: clamp(4rem, 9vw, 7.5rem);
+  border-top: 1px solid var(--border);
+}
+.section__title {
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  letter-spacing: -0.03em;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+
+/* ---------- 8. Projetos (bento) --------------------------- */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.25rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: border-color 0.25s var(--ease), transform 0.3s var(--ease);
+}
+.card:hover { border-color: var(--border-strong); }
+
+.card--wide { grid-row: span 1; }
+
+.card--tinted {
+  background:
+    radial-gradient(120% 90% at 100% 0%, var(--accent-soft) 0%, transparent 60%),
+    var(--surface);
+}
+
+.card__media {
+  display: block;
+  overflow: hidden;
+  background: var(--surface-2);
+}
+.card__media img {
+  width: 100%;
+  aspect-ratio: 1400 / 470;
+  object-fit: cover;
+  object-position: center 45%;
+  transition: transform 0.5s var(--ease);
+}
+.card:hover .card__media img { transform: scale(1.02); }
+
+.card__body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.875rem;
+  flex: 1;
+}
+.card--wide .card__body { padding: 1.75rem; }
+
+.card__title {
+  font-size: 1.25rem;
+  letter-spacing: -0.02em;
+}
+.card__text {
+  color: var(--text-muted);
+  max-width: 62ch;
+  flex: 1;
+}
+
+/* ---------- 9. Sobre (manifesto + pilares) ----------------- */
+.manifesto { max-width: 68ch; }
+.manifesto__lead {
+  font-size: clamp(1.375rem, 2.6vw, 1.875rem);
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  text-wrap: pretty;
+}
+.manifesto__body {
+  margin-top: 1.5rem;
+  color: var(--text-muted);
+  max-width: 62ch;
+}
+
+.pillars {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+.pillar { border-top: 1px solid var(--border-strong); padding-top: 1.25rem; }
+.pillar__title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.pillar__text {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  max-width: 40ch;
+}
+
+/* ---------- 10. Stack (logo wall) ------------------------- */
+.stack-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+}
+.stack-group__title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 1.25rem;
+}
+.stack-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.stack-list li {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--text-muted);
+  font-size: 1.5rem;
+  transition: color 0.2s var(--ease), border-color 0.2s var(--ease),
+              transform 0.3s var(--ease);
+}
+.stack-list li:hover {
+  color: var(--accent);
+  border-color: var(--border-strong);
+  transform: translateY(-2px);
+}
+
+/* ---------- 11. Trajetoria (timeline) --------------------- */
+.timeline { border-top: 1px solid var(--border); }
+.timeline__item {
+  display: grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap: clamp(1rem, 3vw, 2.5rem);
+  padding-block: 1.5rem;
+  align-items: baseline;
+}
+.timeline__item + .timeline__item { border-top: 1px solid var(--border); }
+
+.timeline__when {
+  font-family: var(--mono);
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  padding-top: 0.2rem;
+}
+.timeline__title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.timeline__text {
+  color: var(--text-muted);
+  font-size: 0.9375rem;
+  max-width: 60ch;
+}
+
+/* ---------- 12. Contato ----------------------------------- */
+.section--contact { padding-bottom: clamp(5rem, 10vw, 8rem); }
+.contact__lead {
+  font-size: clamp(1.125rem, 1.8vw, 1.375rem);
+  color: var(--text-muted);
+  max-width: 44ch;
+  margin-bottom: clamp(2rem, 4vw, 3rem);
+}
+.contact__links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+.contact-link {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  background: var(--surface);
+  transition: border-color 0.2s var(--ease), transform 0.3s var(--ease);
+}
+.contact-link:hover { border-color: var(--accent); transform: translateY(-2px); }
+.contact-link__label {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+.contact-link__value {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+/* ---------- 13. Footer ------------------------------------ */
+.footer { border-top: 1px solid var(--border); }
+.footer__inner {
+  padding-block: 2.5rem 3rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+.footer__name { font-weight: 600; }
+.footer__note { font-size: 0.875rem; color: var(--text-muted); }
+
+/* ---------- 13.5 Pagina 404 ------------------------------- */
+.error-page {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-block: 4rem;
+}
+.error-page .hero__sub { margin-top: 1.25rem; }
+.error-page .hero__actions { margin-top: 2rem; }
+
+/* ---------- 14. Reveal no scroll -------------------------- */
+/* Movimento entra pela hierarquia: cada bloco aparece quando
+   chega na tela. Respeita prefers-reduced-motion. */
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+}
+[data-reveal].is-in { opacity: 1; transform: none; }
+
+/* ---------- 15. Responsivo -------------------------------- */
+@media (max-width: 900px) {
+  .hero__grid { grid-template-columns: minmax(0, 1fr); }
+  .panel { max-width: 420px; }
+  .bento { grid-template-columns: minmax(0, 1fr); }
+  .pillars,
+  .stack-grid,
+  .contact__links { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 640px) {
+  .nav__links { display: none; }
+  .hero__title br { display: none; }
+  .pillars,
+  .stack-grid,
+  .contact__links,
+  .timeline__item { grid-template-columns: minmax(0, 1fr); }
+  .timeline__item { gap: 0.35rem; }
+  .timeline__when { padding-top: 0; }
+  .footer__inner { flex-direction: column; align-items: flex-start; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  [data-reveal] { opacity: 1; transform: none; }
+}
+
+@media print {
+  .nav, .theme-toggle, .skip-link { display: none; }
+  body { background: #fff; color: #000; }
+}
