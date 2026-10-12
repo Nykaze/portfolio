@@ -21,4 +21,5 @@ _site/
 
 # Temporarios das ferramentas (tools/*.mjs): capturas e paginas de teste
 _*.html
+tools/_*.mjs
 assets/css/_*.css
