@@ -16,7 +16,7 @@ const flat = (theme) =>
   html
     .replace('<html lang="pt-BR" data-theme="auto">', `<html lang="pt-BR" data-theme="${theme}">`)
     .replace(/<script src="assets\/js\/main.js" defer><\/script>/, "")
-    .replace("<head>", "<head>\n<style>[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important;animation:none!important}</style>");
+    .replace("<head>", "<head>\n<style>[data-reveal]{opacity:1!important;transform:none!important;clip-path:none!important;filter:none!important;animation:none!important}</style>");
 
 for (const theme of ["dark", "light"]) {
   const tmp = `_shot-${theme}.html`;

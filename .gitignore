@@ -18,3 +18,7 @@ _site/
 # Env
 .env
 .env.local
+
+# Temporarios das ferramentas (tools/*.mjs): capturas e paginas de teste
+_*.html
+assets/css/_*.css
