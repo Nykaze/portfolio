@@ -774,8 +774,41 @@ a { color: inherit; text-decoration: none; }
   will-change: transform;
 }
 
-/* Revelacao por secao. O padrao do documento e visivel: quem nao tem
-   JS, ou pediu menos movimento, ve tudo parado e correto. */
+/* Revelacao por secao. Duas implementacoes do mesmo efeito:
+   1. onde o navegador suporta timeline de scroll, o bloco surge enquanto a
+      pagina sobe, e voce acompanha scrubando a rolagem;
+   2. nos outros, um reveal por entrada, com IntersectionObserver.
+   O padrao do documento e visivel: sem JS, tudo parado e correto. */
+
+/* 1. Versao scrolldriver */
+@keyframes emerge {
+  from { opacity: 0; transform: translateY(26px); clip-path: inset(0 0 100% 0); }
+  to   { opacity: 1; transform: none; clip-path: inset(-24% 0 -24% 0); }
+}
+
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .js-scroll [data-reveal] {
+      animation: emerge linear both;
+      animation-timeline: view();
+      /* cover, e nao entry: um elemento mais alto que a viewport nunca
+         termina a fase entry, e ficaria cortado para sempre. cover
+         termina com folga antes disso. */
+      /* --reveal-end vem do main.js: no fim do documento o bloco nao
+         percorre a faixa inteira, e o fim precisa encurtar junto. */
+      animation-range: cover 8% var(--reveal-end, 42%);
+    }
+
+    /* Cascata: quem divide linha com alguem entra depois. As faixas
+       fecham cedo de proposito. Se o ultimo bloco da pagina terminar perto
+       do fim da rolagem, ele nunca chega a 100% e fica cortado. */
+    .js-scroll [data-reveal]:nth-child(2) { animation-range: cover 13% var(--reveal-end, 47%); }
+    .js-scroll [data-reveal]:nth-child(3) { animation-range: cover 18% var(--reveal-end, 52%); }
+    .js-scroll [data-reveal]:nth-child(4) { animation-range: cover 23% var(--reveal-end, 57%); }
+  }
+}
+
+/* 2. Versao com observer, para o resto dos navegadores */
 @media (prefers-reduced-motion: no-preference) {
   .js-reveal [data-reveal] {
     opacity: 0;

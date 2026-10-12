@@ -40,36 +40,85 @@
     paint();
   }
 
-  /* ---- 2. Revelacao ao entrar na tela --------------------- */
-  /* A classe .js-reveal so entra quando o movimento e aceito.
-     Sem ela, [data-reveal] fica visivel e sem transicao. */
+  /* ---- 2. Revelacao --------------------------------------- */
+  /* O efeito e o mesmo nos dois caminhos, mas a execucao muda:
+     onde existe timeline de scroll, quem conduz e a barra de rolagem e o
+     texto aparece sob o seu comando. Onde nao existe, o reveal acontece
+     quando o bloco entra na tela. */
   if (!reduced && "IntersectionObserver" in window) {
-    root.classList.add("js-reveal");
+    var supportsScrollTimeline =
+      typeof CSS !== "undefined" &&
+      CSS.supports &&
+      CSS.supports("animation-timeline", "view()");
 
-    var targets = document.querySelectorAll("[data-reveal]");
+    /* O scrub so existe onde o bloco tem tempo de tela. Quem esta no fim
+       do documento nao percorre a faixa cover inteira: em telas altas a
+       lista de contato parava com parte cortada no fim da rolagem. Aqui a
+       gente encurta o fim de quem nao alcanca, partindo do fim nominal
+       que o CSS ja definiu (42/47/52/57%). O CSS continua mandando. */
+    var FOLGA = 8; // pontos percentuais antes do alcance real
+    var MINIMO = 8; // piso pratico: abaixo disso o bloco revela cedo demais
 
-    // Escalona quem esta no mesmo bloco pai, para a entrada ler
-    // como sequencia e nao como oito coisas independentes.
-    var seen = new WeakMap();
-    targets.forEach(function (el) {
-      var group = el.parentElement;
-      var i = seen.get(group) || 0;
-      el.style.transitionDelay = Math.min(i, 3) * 80 + "ms";
-      seen.set(group, i + 1);
+    var alvosFim = document.querySelectorAll("[data-reveal]");
+
+    // Guarda o fim nominal antes de qualquer calibracao, senao a proxima
+    // leitura enxergaria o valor que a gente acabou de escrever.
+    alvosFim.forEach(function (el) {
+      var nominal = parseFloat(getComputedStyle(el).animationRangeEnd);
+      if (!isNaN(nominal)) el.dataset.revealEnd = String(nominal);
     });
 
-    var io = new IntersectionObserver(
-      function (entries) {
-        entries.forEach(function (entry) {
-          if (!entry.isIntersecting) return;
-          entry.target.classList.add("is-in");
-          io.unobserve(entry.target);
-        });
-      },
-      { rootMargin: "0px 0px -10% 0px", threshold: 0 }
-    );
+    function calibrarFim() {
+      var doc = document.documentElement;
+      var vp = doc.clientHeight;
+      var fim = doc.scrollHeight;
 
-    targets.forEach(function (el) { io.observe(el); });
+      alvosFim.forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        // Fracao da faixa cover que o bloco consegue percorrer antes da
+        // rolagem acabar: do topo do bloco ate o fim do documento, sobre
+        // viewport + altura do bloco, que e o tamanho da faixa cover.
+        var alcance = (fim - (r.top + window.scrollY)) / (vp + r.height);
+        var nominal = parseFloat(el.dataset.revealEnd) || 42;
+        var end = Math.max(MINIMO, Math.min(nominal, alcance * 100 - FOLGA));
+        el.style.setProperty("--reveal-end", end.toFixed(1) + "%");
+      });
+    }
+
+    if (supportsScrollTimeline) {
+      // O CSS cuida da animacao. A gente so calibra o fim da faixa.
+      root.classList.add("js-scroll");
+      calibrarFim();
+      window.addEventListener("resize", calibrarFim);
+      window.addEventListener("load", calibrarFim);
+    } else {
+      root.classList.add("js-reveal");
+
+      var targets = document.querySelectorAll("[data-reveal]");
+
+      // Escalona quem esta no mesmo bloco pai, para a entrada ler
+      // como sequencia e nao como oito coisas independentes.
+      var seen = new WeakMap();
+      targets.forEach(function (el) {
+        var group = el.parentElement;
+        var i = seen.get(group) || 0;
+        el.style.transitionDelay = Math.min(i, 3) * 80 + "ms";
+        seen.set(group, i + 1);
+      });
+
+      var io = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add("is-in");
+            io.unobserve(entry.target);
+          });
+        },
+        { rootMargin: "0px 0px -10% 0px", threshold: 0 }
+      );
+
+      targets.forEach(function (el) { io.observe(el); });
+    }
   }
 
   /* ---- 3. Chegada do hero --------------------------------- */

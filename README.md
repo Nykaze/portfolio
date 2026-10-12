@@ -75,9 +75,13 @@ Quatro camadas, todas desligadas por `prefers-reduced-motion`:
 2. **Diagrama request → middleware → banco → resposta** no hero. O trilho anima
    `background-position` (paint puro, sem reflow) e cada nó acende quando o
    varredor passa por ele.
-3. **Revelação por seção** ao entrar na tela, com escalonamento dentro de cada
-   grupo. A classe `.js-reveal` só entra quando o movimento é aceito, então sem
-   JS a página já nasce visível.
+3. **Revelação por seção** ligada à rolagem, com escalonamento dentro de cada
+   grupo. Onde o navegador tem `animation-timeline: view()`, quem conduz é a
+   barra de rolagem (classe `.js-scroll`) e o fim da faixa é calibrado por
+   bloco, para quem está no fim do documento não ficar cortado em tela alta.
+   Nos outros navegadores, um reveal por entrada com IntersectionObserver
+   (classe `.js-reveal`). As duas classes só entram quando o movimento é
+   aceito, então sem JS a página já nasce visível.
 4. **Barra de progresso** no topo, `scaleX` puro, alimentada por `requestAnimationFrame`.
 
 ## Conferir visualmente
@@ -87,6 +91,8 @@ node tools/contrast.mjs            # contraste dos dois temas, precisa dar 0 fal
 node tools/shots.mjs               # desktop e mobile, claro e escuro
 node tools/verify.mjs              # erros de JS e estado das animacoes
 node tools/verify.mjs --motion     # o mesmo forçando movimento ligado
+node tools/verify-reveal.mjs       # caminho com timeline de scroll, no fim da rolagem
+node tools/verify-legacy.mjs       # caminho legado, por pintura real
 ```
 
 As capturas vão para `%TEMP%\opencode\shots`. O Chrome headless no Windows tem
